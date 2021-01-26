@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Simon Dice</title>
+    <style>
+      body {
+        margin: 0;
+        background: #dedede;
+        display: flex;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .gameboard {
+        height: 100vh;
+        width: 100vh;
+        border-radius: 50%;
+        overflow: hidden;
+        margin: 0 auto;
+        max-height: 60vh;
+        max-width: 60vh;
+      }
+
+      .color {
+        width: 50%;
+        height: 50%;
+        display: inline-block;
+      }
+
+      .left {
+        float: left;
+      }
+
+      .right {
+        float: left;
+      }
+
+      .celeste {
+        background: #22a6b3;
+      }
+
+      .celeste.light {
+        background: #7ed6df;
+      }
+
+      .violeta {
+        background: #be2edd;
+      }
+
+      .violeta.light {
+        background: #e056fd;
+      }
+
+      .naranja {
+        background: #f0932b;
+      }
+
+      .naranja.light {
+        background: #ffbe76;
+      }
+
+      .verde {
+        background: #6ab04c;
+      }
+
+      .verde.light {
+        background: #badc58;
+      }
+
+      .btn-start {
+        width: 400px;
+        height: 100px;
+        background: #ecf0f1;
+        color: #2c3e50;
+        font-size: 2.5rem;
+        position: absolute;
+        top: calc(50% - 50px);
+        left: calc(50% - 200px);
+      }
+
+      .hide {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="gameboard">
+      <div id="celeste" class="color celeste left" data-color="celeste"></div>
+      <div id="violeta" class="color violeta right" data-color="violeta"></div>
+      <div id="naranja" class="color naranja left" data-color="naranja"></div>
+      <div id="verde" class="color verde right" data-color="verde"></div>
+      <button id="btnEmpezar" class="btn-start" onclick="empezarJuego()">Empezar a jugar!</button>
+    </div>
+    <script>
+      const celeste = document.getElementById('celeste')
+      const violeta = document.getElementById('violeta')
+      const naranja = document.getElementById('naranja')
+      const verde = document.getElementById('verde')
+      // devuelve una referencia al elemento por su id - es una cadena sensible a mayuculas referiada al id unico del elemento buscado 
+      // esta funcion recibe un string con el id del elemeto que desamos optener 
+      const btnEmpezar = document.getElementById('btnEmpezar')
+      const ULTIMO_NIVEL = 10
+
+// esta clase va a tener toda la logica del videojuego 1
+// se define el constructor con o sin parametros inicales
+      class Juego {
+        constructor() {
+          // this llama las funciones 
+          this.inicializar()
+          this.generarSecuencia()
+          this.siguienteNivel()
+        }
+
+        inicializar() {
+          this.elegirColor = this.elegirColor.bind(this)
+          btnEmpezar.classList.add('hide')  //la propiedad de solo lectura element.classlist devuelve una cleccion activa de DOMTokenList de los atributos de clases del elemento https://developer.mozilla.org/es/docs/Web/API/Element/classList
+          this.nivel = 1
+          this.colores = {
+            celeste,
+            violeta,
+            naranja, 
+            verde,
+            // javascrip da la opcion de traer directamente los nombres de las variables si llevan el mismo nombre 
+            // la idea es traerlos en this para tenerlos mas al alcance y poder hacer operaciones mas facilmente 
+          }
+        }
+
+        generarSecuencia() {
+          this.secuencia = new Array(10).fill(0).map(n => Math.floor(Math.random() *4))
+        }
+        // floor redondea un decimal 
+
+        siguienteNivel(){
+          this.subnivel = 0
+          this.iluminarSecuencia()
+          this.agregarEventoClick()
+          
+        }
+
+        transformarNumeroAColor(numero) {
+          switch (numero) {
+            case 0:
+              return 'celeste'
+            case 1: 
+              return 'violeta'
+            case 2: 
+              return 'naranja'
+            case 3: 
+              return 'verde'
+          }s
+        }
+
+        transformarColoANumero(color) {
+          switch (color) {
+            case 'celeste':
+              return 0
+            case 'violeta': 
+              return 1
+            case 'naranja': 
+              return 2
+            case 'verde':
+              return  3
+          }
+        }
+      
+        iluminarSecuencia(){
+          for (let i = 0; i < this.nivel; i++){
+          const color = this.transformarNumeroAColor(this.secuencia[i])
+            this.iluminarColor(color)
+            setTimeout(() => this.iluminarColor(color),1000 * i)
+            }
+          }
+        
+        iluminarColor(color){
+          this.colores[color].classList.add('light')
+          // funcion para que otra se realice en un tiempo especifico 
+          setTimeout(() => this.apagarColor(color), 350)
+          }
+        
+
+        apagarColor(color){
+          this.colores[color].classList.remove('light')
+        }
+
+        agregarEventoClick(){
+          var_this = this
+          this.colores.celeste.addEventListener('click', this.elegirColor)
+          this.colores.verde.addEventListener('click', this.elegirColor)
+          this.colores.violeta.addEventListener('click', this.elegirColor)
+          this.colores.naranja.addEventListener('click', this.elegirColor)
+        }
+        // addEventListener para agregar un menejador de un evento indicando el nom y luego la funcion 
+      
+        elegirColor(ev){
+          const nombreColor = ev.target.dataset.color          
+          const numeroColor = transformarColoANumero(nombreColor)
+          this-iluminarColor(nombreColor)
+          if (numberColor === this.secuencia[this.subnivel]){
+            this.subnivel++
+            if (this.subnivel === this.nivel){
+            this.nivel++
+            // this.eliminarEventosClick()
+            if (this.nivel === (ULTIMO_NIVEL + 1 )){
+            // Ganó
+            } else {
+              this.siguienteNivel()
+            }
+          }
+        } else {
+          // perdió
+        }
+      }
+
+
+      function empezarJuego() {
+        window.juego = new Juego()
+      // window se usa para debugear es decir ver lo que esta pasando 
+      }
+    </script>
+  </body>
+</html>
