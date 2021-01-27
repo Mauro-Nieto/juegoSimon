@@ -92,6 +92,7 @@
       <div id="verde" class="color verde right" data-color="verde"></div>
       <button id="btnEmpezar" class="btn-start" onclick="empezarJuego()">Empezar a jugar!</button>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" integrity="sha512-AA1Bzp5Q0K1KanKKmvN/4d3IRKVlv9PYgwFPvm32nPO6QS8yH1HO7LbgB1pgiOxPtfeg5zEn2ba64MUcqJx6CA==" crossorigin="anonymous"></script>
     <script>
       const celeste = document.getElementById('celeste')
       const violeta = document.getElementById('violeta')
@@ -102,19 +103,23 @@
       const btnEmpezar = document.getElementById('btnEmpezar')
       const ULTIMO_NIVEL = 10
 
+      swal ('hola') 
+
 // esta clase va a tener toda la logica del videojuego 1
 // se define el constructor con o sin parametros inicales
       class Juego {
         constructor() {
           // this llama las funciones 
+          this.inicializar = this.inicializar.bind(this)
           this.inicializar()
           this.generarSecuencia()
-          this.siguienteNivel()
+          setTimeout (this.siguienteNivel, 500)
         }
 
         inicializar() {
+          this.siguienteNievel = this.siguienteNivel.bind(this)
           this.elegirColor = this.elegirColor.bind(this)
-          btnEmpezar.classList.add('hide')  //la propiedad de solo lectura element.classlist devuelve una cleccion activa de DOMTokenList de los atributos de clases del elemento https://developer.mozilla.org/es/docs/Web/API/Element/classList
+          this.toggleBtnEmpezar()
           this.nivel = 1
           this.colores = {
             celeste,
@@ -126,16 +131,23 @@
           }
         }
 
+        toggleBtnEmpezar() {
+          if(btnEmpezar.classList.contains('hide')) {
+            btnEmpezar.classList.remove('hide')
+          } else {
+            btnEmpezar.classList.add('hide')
+          }
+        }
+
         generarSecuencia() {
-          this.secuencia = new Array(10).fill(0).map(n => Math.floor(Math.random() *4))
+          this.secuencia = new Array(ULTIMO_NIVEL).fill(0).map(n => Math.floor(Math.random() *4))
         }
         // floor redondea un decimal 
 
         siguienteNivel(){
           this.subnivel = 0
           this.iluminarSecuencia()
-          this.agregarEventoClick()
-          
+          this.agregarEventosClick()         
         }
 
         transformarNumeroAColor(numero) {
@@ -148,7 +160,7 @@
               return 'naranja'
             case 3: 
               return 'verde'
-          }s
+          }
         }
 
         transformarColoANumero(color) {
@@ -166,11 +178,10 @@
       
         iluminarSecuencia(){
           for (let i = 0; i < this.nivel; i++){
-          const color = this.transformarNumeroAColor(this.secuencia[i])
-            this.iluminarColor(color)
-            setTimeout(() => this.iluminarColor(color),1000 * i)
-            }
+            const color = this.transformarNumeroAColor(this.secuencia[i])
+            setTimeout(() => this.iluminarColor(color), 1000 * i)
           }
+        }
         
         iluminarColor(color){
           this.colores[color].classList.add('light')
@@ -183,8 +194,7 @@
           this.colores[color].classList.remove('light')
         }
 
-        agregarEventoClick(){
-          var_this = this
+        agregarEventosClick(){
           this.colores.celeste.addEventListener('click', this.elegirColor)
           this.colores.verde.addEventListener('click', this.elegirColor)
           this.colores.violeta.addEventListener('click', this.elegirColor)
@@ -192,26 +202,48 @@
         }
         // addEventListener para agregar un menejador de un evento indicando el nom y luego la funcion 
       
+        eliminarEventosClick(){
+          this.colores.celeste.removeEventListener('click', this.elegirColor)
+          this.colores.verde.removeEventListener('click', this.elegirColor)
+          this.colores.violeta.removeEventListener('click', this.elegirColor)
+          this.colores.naranja.removeEventListener('click', this.elegirColor)
+        
+        }
+
         elegirColor(ev){
           const nombreColor = ev.target.dataset.color          
-          const numeroColor = transformarColoANumero(nombreColor)
-          this-iluminarColor(nombreColor)
-          if (numberColor === this.secuencia[this.subnivel]){
+          const numeroColor = this.transformarColorANumero(nombreColor)       
+          this.iluminarColor(nombreColor)
+          if (numeroColor === this.secuencia[this.subnivel]){
             this.subnivel++
             if (this.subnivel === this.nivel){
             this.nivel++
-            // this.eliminarEventosClick()
+            this.eliminarEventosClick()
             if (this.nivel === (ULTIMO_NIVEL + 1 )){
-            // Ganó
+              this.ganoElJuego()
             } else {
-              this.siguienteNivel()
+              setTimeout(this.siguienteNivel, 1500)
             }
           }
         } else {
-          // perdió
+          this.perdioElJuego()
         }
       }
 
+      ganoElJuego(){
+        swal('Felicitaciones, ganaste el juego!', 'success')
+        .then(this.inicializar)
+      }
+
+      perdioElJuego(){
+        swal('Lo lamentamos, perdiste el juego!', 'error')
+        .then(() => {
+          this.eliminarEventoClick()
+          this.inicializar()
+        })
+      }
+
+    }
 
       function empezarJuego() {
         window.juego = new Juego()
