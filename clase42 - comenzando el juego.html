@@ -82,6 +82,9 @@
       .hide {
         display: none;
       }
+      * {
+        font-family: Arial, Helvetica, sans-serif;
+      }
     </style>
   </head>
   <body>
@@ -98,18 +101,15 @@
       const violeta = document.getElementById('violeta')
       const naranja = document.getElementById('naranja')
       const verde = document.getElementById('verde')
-      // devuelve una referencia al elemento por su id - es una cadena sensible a mayuculas referiada al id unico del elemento buscado 
-      // esta funcion recibe un string con el id del elemeto que desamos optener 
       const btnEmpezar = document.getElementById('btnEmpezar')
       const ULTIMO_NIVEL = 10
-
       swal ('hola') 
 
 // esta clase va a tener toda la logica del videojuego 1
 // se define el constructor con o sin parametros inicales
       class Juego {
         constructor() {
-          // this llama las funciones 
+
           this.inicializar = this.inicializar.bind(this)
           this.inicializar()
           this.generarSecuencia()
@@ -117,7 +117,7 @@
         }
 
         inicializar() {
-          this.siguienteNievel = this.siguienteNivel.bind(this)
+          this.siguienteNivel = this.siguienteNivel.bind(this)
           this.elegirColor = this.elegirColor.bind(this)
           this.toggleBtnEmpezar()
           this.nivel = 1
@@ -126,8 +126,6 @@
             violeta,
             naranja, 
             verde,
-            // javascrip da la opcion de traer directamente los nombres de las variables si llevan el mismo nombre 
-            // la idea es traerlos en this para tenerlos mas al alcance y poder hacer operaciones mas facilmente 
           }
         }
 
@@ -163,7 +161,7 @@
           }
         }
 
-        transformarColoANumero(color) {
+        transformarColorANumero(color) {
           switch (color) {
             case 'celeste':
               return 0
@@ -185,7 +183,6 @@
         
         iluminarColor(color){
           this.colores[color].classList.add('light')
-          // funcion para que otra se realice en un tiempo especifico 
           setTimeout(() => this.apagarColor(color), 350)
           }
         
@@ -200,7 +197,6 @@
           this.colores.violeta.addEventListener('click', this.elegirColor)
           this.colores.naranja.addEventListener('click', this.elegirColor)
         }
-        // addEventListener para agregar un menejador de un evento indicando el nom y luego la funcion 
       
         eliminarEventosClick(){
           this.colores.celeste.removeEventListener('click', this.elegirColor)
